@@ -203,6 +203,6 @@ class DecoderHelperTest {
         val packet = helper.getPacket(binary)
         packet as OperatorPacket
         val total = helper.evaluate(packet)
-        assertEquals(1, total)
+        assertEquals(539051801941, total)
     }
 }
