@@ -1,4 +1,4 @@
-package com.santa.adventcalendar.day15
+package com.santa.adventcalendar.day16
 
 open class Packet(protected val bits: Array<Int>) {
     val version = parseBits(0, 2)

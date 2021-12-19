@@ -1,4 +1,4 @@
-package com.santa.adventcalendar.day15
+package com.santa.adventcalendar.day16
 
 class ValuePacket(bits: Array<Int>): Packet(bits) {
     val value = decodeBits(bits, 6)

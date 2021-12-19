@@ -1,4 +1,4 @@
-package com.santa.adventcalendar.day15
+package com.santa.adventcalendar.day16
 
 class DecoderHelper {
     fun hexToBinary(hex: String): Array<Int> {

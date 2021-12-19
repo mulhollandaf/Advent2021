@@ -1,4 +1,4 @@
-package com.santa.adventcalendar.day15
+package com.santa.adventcalendar.day16
 
 class OperatorPacket(bits: Array<Int>): Packet(bits) {
     val subPacketEnd: Int = getSubPacketLength(bits)

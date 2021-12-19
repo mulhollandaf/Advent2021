@@ -1,4 +1,4 @@
-package com.santa.adventcalendar.day15
+package com.santa.adventcalendar.day16
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals

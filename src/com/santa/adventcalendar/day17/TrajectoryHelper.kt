@@ -1,4 +1,4 @@
-package com.santa.adventcalendar.day16
+package com.santa.adventcalendar.day17
 
 class TrajectoryHelper {
     fun takeTurn(probe: Probe) {
