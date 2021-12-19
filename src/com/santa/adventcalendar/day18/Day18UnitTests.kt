@@ -30,6 +30,38 @@ class Day18UnitTests {
     }
 
     @Test
+    fun explodeTwoDigitTest() {
+        val helper = SnailFishHelper()
+        val num = "[[[[[9,18],1],2],3],4]"
+        val exploded = helper.explode(num)
+        assertEquals("[[[[0,19],2],3],4]", exploded)
+    }
+
+    @Test
+    fun explodeDoubleTwoDigitTest() {
+        val helper = SnailFishHelper()
+        val num = "[[[[[19,18],1],2],3],4]"
+        val exploded = helper.explode(num)
+        assertEquals("[[[[0,19],2],3],4]", exploded)
+    }
+
+    @Test
+    fun explodeIntoTwoDigitTest() {
+        val helper = SnailFishHelper()
+        val num = "[[[[4,0],[5,4]],[[7,7],[0,[6,7]]]],[10,[[11,9],[11,0]]]]"
+        val exploded = helper.explode(num)
+        assertEquals("[[[[4,0],[5,4]],[[7,7],[6,0]]],[17,[[11,9],[11,0]]]]", exploded)
+    }
+
+    @Test
+    fun explodeIntoTwoDigitsLeft() {
+        val helper = SnailFishHelper()
+        val num = "[[[[12,12],[6,14]],[[15,0],[17,[8,1]]]],[2,9]]"
+        val exploded = helper.explode(num)
+        assertEquals("[[[[12,12],[6,14]],[[15,0],[25,0]]],[3,9]]", exploded)
+    }
+
+    @Test
     fun explode2Test() {
         val helper = SnailFishHelper()
         val num = "[7,[6,[5,[4,[3,2]]]]]"
@@ -114,8 +146,27 @@ class Day18UnitTests {
         val helper = SnailFishHelper()
         val inputs = arrayOf(
             "[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]",
-            "[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]")
+            "[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]",
+            "[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]",
+            "[[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]",
+            "[7,[5,[[3,8],[1,4]]]]",
+            "[[2,[2,2]],[8,[8,1]]]",
+            "[2,9]",
+            "[1,[[[9,3],9],[[9,0],[0,7]]]]",
+            "[[[5,[7,4]],7],1]",
+            "[[[[4,2],2],6],[8,7]]")
         val num = helper.addReduce(inputs)
         assertEquals("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]", num)
+    }
+
+    @Test
+    fun brokenAddReduceTest() {
+        val inputs = arrayOf(
+            "[[[[6,6],[6,6]],[[6,0],[6,7]]],[[[7,7],[8,9]],[8,[8,1]]]]",
+            "[2,9]"
+        )
+        val helper = SnailFishHelper()
+        val num = helper.addReduce(inputs)
+        assertEquals("[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]]", num)
     }
 }

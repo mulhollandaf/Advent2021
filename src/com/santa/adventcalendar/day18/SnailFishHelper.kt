@@ -27,14 +27,33 @@ class SnailFishHelper {
             return null //no explosion today
         }
         val leftSide = num.substring(0, explodeIndex)
-        val rightSide = num.substring(explodeIndex + 5)
-        val first = num[explodeIndex + 1].digitToInt()
-        val second = num[explodeIndex + 3].digitToInt()
+
+        //Check if two digit
+        val first = getNumber(num, explodeIndex + 1)
+        var offset = 0
+        if (first > 9) {
+            offset++
+        }
+        val second = getNumber(num, explodeIndex + 3 + offset)
+        if (second > 9) {
+            offset++
+        }
+
+        val rightSide = num.substring(explodeIndex + 5 + offset)
 
         val adjustedLeft = addToLeft(leftSide, first)
         val adjustedRight = addToRight(rightSide, second)
 
         return "${adjustedLeft}0${adjustedRight}"
+    }
+
+    private fun getNumber(num: String, explodeIndex: Int): Int {
+        val number = num[explodeIndex].digitToInt()
+        return if (num[explodeIndex - 1].isDigit()) {
+            return number + 10 * num[explodeIndex - 1].digitToInt()
+        } else if (num[explodeIndex + 1].isDigit()) {
+            number * 10 + num[explodeIndex + 1].digitToInt()
+        } else number
     }
 
     private fun addToLeft(leftSide: String, first: Int): String {
@@ -79,13 +98,17 @@ class SnailFishHelper {
     }
 
     private fun addExplodeLeft(leftSide: String, valIndex: Int, add: Int): String {
-        val newValue = leftSide[valIndex].digitToInt() + add
-        return leftSide.replaceRange(valIndex, valIndex + 1, newValue.toString())
+        val newValue = getNumber(leftSide, valIndex)
+        val offset = if (newValue > 9) 1 else 0
+        val sum = newValue + add
+        return leftSide.replaceRange(valIndex - offset, valIndex + 1, sum.toString())
     }
 
     private fun addExplodeRight(rightSide: String, valIndex: Int, add: Int): String {
-        val newValue = rightSide[valIndex].digitToInt() + add
-        return rightSide.replaceRange(valIndex, valIndex + 1, newValue.toString())
+        val newValue = getNumber(rightSide, valIndex)
+        val offset = if (newValue > 9) 1 else 0
+        val sum = newValue + add
+        return rightSide.replaceRange(valIndex, valIndex + 1 + offset, sum.toString())
     }
 
     fun split(num: String): String? {
@@ -103,6 +126,7 @@ class SnailFishHelper {
 
     fun reduce(num: String): String {
         var value = num
+        var last = ""
         var quit = false
         while (!quit) {
             val exploded = explode(value)
@@ -112,9 +136,11 @@ class SnailFishHelper {
                     quit = true
                     return value
                 } else {
+                    last = value
                     value = split
                 }
             } else {
+                last = value
                 value = exploded
             }
         }
@@ -129,7 +155,9 @@ class SnailFishHelper {
                 sum = input
             } else {
                 sum?.let {
+                    println("Adding $it to $input")
                     sum = reduce(add(it, input))
+                    println(sum)
                 }
             }
         }
