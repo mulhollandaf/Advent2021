@@ -1,131 +1,140 @@
 package com.santa.adventcalendar.day18
 
 class SnailFishHelper {
-    private var index = 0
-    fun parse(string: String): PairSnailNumber {
-        index = 0
-        val top = parsePairRecursive(string)
-        tellChildrenWhoDaddyIs(top)
-        return top
+    fun add(num1: String, num2: String): String {
+        return "[$num1,$num2]"
     }
 
-    private fun tellChildrenWhoDaddyIs(parent: PairSnailNumber) {
-        parent.first.parent = parent
-        parent.second.parent = parent
-        if (parent.first is PairSnailNumber) {
-            tellChildrenWhoDaddyIs(parent.first as PairSnailNumber)
-        }
-        if (parent.second is PairSnailNumber) {
-            tellChildrenWhoDaddyIs(parent.second as PairSnailNumber)
-        }
-    }
-
-    private fun parsePairRecursive(string: String): PairSnailNumber {
-        index++
-        val first = parseRecursive(string)
-        if (string[index] == ',') index++
-        val second = parseRecursive(string)
-        index++
-        return PairSnailNumber(first, second)
-    }
-
-    private fun parseRecursive(string: String): SnailNumber {
-        var num = 0
-        while (string[index] != ']' && string[index] != ',') {
-            if (string[index] == '[') {
-                return parsePairRecursive(string)
-            } else {
-                num = num * 10 + string[index].digitToInt()
-                index++
+    fun indexOfFirstExplode(num: String): Int {
+        var depth = 0
+        num.forEachIndexed{x, letter ->
+            if (letter == '[') {
+                depth++
+            } else if (letter == ']') {
+                depth--
+            }
+            if ( depth == 5 ) {
+                return x
             }
         }
-        index++
-        return ConstantSnailNumber(num)
+
+        return -1
     }
 
-    fun add(num1: PairSnailNumber, num2: PairSnailNumber): PairSnailNumber {
-        return PairSnailNumber(num1, num2)
-    }
-
-    fun canExplode(num: PairSnailNumber): Boolean {
-        val depth = 1
-        return canExplodeRecursive(num.first, depth) || canExplodeRecursive(num.second, depth)
-    }
-
-    private fun canExplodeRecursive(num: SnailNumber, depth: Int): Boolean {
-        if (num is ConstantSnailNumber) {
-            return false
+    fun explode(num: String): String? {
+        val explodeIndex = indexOfFirstExplode(num)
+        if (explodeIndex < 0) {
+            return null //no explosion today
         }
-        num as PairSnailNumber
+        val leftSide = num.substring(0, explodeIndex)
+        val rightSide = num.substring(explodeIndex + 5)
+        val first = num[explodeIndex + 1].digitToInt()
+        val second = num[explodeIndex + 3].digitToInt()
 
-        if (depth == 4) {
-            return true
-        }
-        return canExplodeRecursive(num.first, depth + 1) || canExplodeRecursive(num.second, depth + 1)
+        val adjustedLeft = addToLeft(leftSide, first)
+        val adjustedRight = addToRight(rightSide, second)
+
+        return "${adjustedLeft}0${adjustedRight}"
     }
 
-    fun explode(num: PairSnailNumber) {
-        val depth = 1
-        explodeRecursive(num.first, depth) || explodeRecursive(num.second, depth)
+    private fun addToLeft(leftSide: String, first: Int): String {
+        val indexOfFirstLeftVal = getFirstLeftVal(leftSide)
+        val adjusted =  if (indexOfFirstLeftVal > 0) {
+            //Add
+            addExplodeLeft(leftSide, indexOfFirstLeftVal, first)
+        }
+        else {
+            leftSide
+        }
+        return if (adjusted.lastIndexOfAny(numbers) == adjusted.length - 1) {
+            "$adjusted,"
+        } else {
+            adjusted
+        }
     }
 
-    private fun explodeRecursive(num: SnailNumber, depth: Int): Boolean {
-        if (num is ConstantSnailNumber) {
-            return false
+    private fun addToRight(rightSide: String, second: Int): String {
+        val indexOfFirstRightVal = getFirstRightVal(rightSide)
+        val adjusted = if (indexOfFirstRightVal > 0) {
+            //Add
+            addExplodeRight(rightSide, indexOfFirstRightVal, second)
         }
-        num as PairSnailNumber
+        else {
+            rightSide
+        }
 
-        if (depth == 4) {
-            val foundLeftPair = explodeLeft(num.first as ConstantSnailNumber)
-            val foundRightPair = explodeRight(num.second as ConstantSnailNumber)
-            if (foundLeftPair && foundRightPair) {
-                //set this pair to 0
-                val grandparent = num.parent?.parent
-                val zero = ConstantSnailNumber(0)
-                zero.parent = grandparent
-                if (num.parent?.first == num) {
-                    num.parent?.first = zero
+        return if (adjusted.indexOfAny(numbers) == 0) {
+            return ",$adjusted"
+        } else {
+            adjusted
+        }
+    }
 
+    private fun getFirstLeftVal(num: String): Int {
+        return num.lastIndexOfAny(numbers)
+    }
+
+    private fun getFirstRightVal(num: String): Int {
+        return num.indexOfAny(numbers)
+    }
+
+    private fun addExplodeLeft(leftSide: String, valIndex: Int, add: Int): String {
+        val newValue = leftSide[valIndex].digitToInt() + add
+        return leftSide.replaceRange(valIndex, valIndex + 1, newValue.toString())
+    }
+
+    private fun addExplodeRight(rightSide: String, valIndex: Int, add: Int): String {
+        val newValue = rightSide[valIndex].digitToInt() + add
+        return rightSide.replaceRange(valIndex, valIndex + 1, newValue.toString())
+    }
+
+    fun split(num: String): String? {
+        val bigIndex = getFirstIndexOfBigNumber(num)
+        if (bigIndex < 0) return null
+        val bigNumber = Integer.parseInt(num.substring(bigIndex, bigIndex + 2))
+        val first = bigNumber / 2
+        val second = (bigNumber + 1) / 2
+        return num.substring(0, bigIndex) + "[$first,$second]" + num.substring(bigIndex + 2)
+    }
+
+    private fun getFirstIndexOfBigNumber(num: String): Int {
+        return "[0-9][0-9]".toRegex().find(num)?.range?.first ?: -1
+    }
+
+    fun reduce(num: String): String {
+        var value = num
+        var quit = false
+        while (!quit) {
+            val exploded = explode(value)
+            if (exploded == null) {
+                val split = split(value)
+                if (split == null) {
+                    quit = true
+                    return value
                 } else {
-                    num.parent?.second = zero
+                    value = split
                 }
-
+            } else {
+                value = exploded
             }
-            return true
         }
+        return value
 
-        return explodeRecursive(num.first, depth + 1) || explodeRecursive(num.second, depth + 1)
     }
 
-    private fun explodeLeft(number: ConstantSnailNumber): Boolean {
-        //find first left constant
-        var check = number.parent?.parent
-        while (check?.parent != null && check.first !is ConstantSnailNumber) {
-            check = check.parent as PairSnailNumber
+    fun addReduce(inputs: Array<String>): String {
+        var sum: String? = null
+        inputs.forEach { input ->
+            if (sum == null) {
+                sum = input
+            } else {
+                sum?.let {
+                    sum = reduce(add(it, input))
+                }
+            }
         }
-        if (check?.first is ConstantSnailNumber) {
-            (check.first as ConstantSnailNumber).value += number.value
-            return true
-        } else {
-            number.parent?.parent?.first = ConstantSnailNumber(0)
-            number.parent?.parent?.first?.parent = number.parent?.parent
-            return false
-        }
+        return sum ?: ""
     }
 
-    private fun explodeRight(number: ConstantSnailNumber): Boolean {
-        //find first right constant
-        var check = number.parent?.parent
-        while (check?.parent != null && check.second !is ConstantSnailNumber) {
-            check = check.parent as PairSnailNumber
-        }
-        if (check?.second is ConstantSnailNumber) {
-            (check.second as ConstantSnailNumber).value += number.value
-            return true
-        } else {
-            number.parent?.parent?.second = ConstantSnailNumber(0)
-            number.parent?.parent?.second?.parent = number.parent?.parent
-            return false
-        }
-    }
+    private val numbers = charArrayOf('0','1','2','3','4','5','6','7','8','9')
 }
