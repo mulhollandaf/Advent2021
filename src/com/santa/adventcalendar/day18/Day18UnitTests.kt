@@ -169,4 +169,12 @@ class Day18UnitTests {
         val num = helper.addReduce(inputs)
         assertEquals("[[[[6,6],[7,7]],[[0,7],[7,7]]],[[[5,5],[5,6]],9]]", num)
     }
+
+    @Test
+    fun magTest() {
+        val num = "[[9,1],[1,9]]"
+        val helper = SnailFishHelper()
+        val mag = helper.getMagnitude(num)
+        assertEquals(129, mag)
+    }
 }

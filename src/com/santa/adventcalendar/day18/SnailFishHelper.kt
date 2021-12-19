@@ -164,5 +164,60 @@ class SnailFishHelper {
         return sum ?: ""
     }
 
+    fun getMagnitude(num: String): Int {
+        val pair = parse(num)
+        return getMagnitudeRecursive(pair)
+    }
+
+    private fun getMagnitudeRecursive(number: SnailNumber): Int {
+        if (number is ConstantSnailNumber) {
+            return number.value
+        }
+        number as PairSnailNumber
+        return 3* getMagnitudeRecursive(number.first) + 2* getMagnitudeRecursive(number.second)
+    }
+
+    private var index = 0
+    fun parse(string: String): PairSnailNumber {
+        index = 0
+        val top = parsePairRecursive(string)
+        tellChildrenWhoDaddyIs(top)
+        return top
+    }
+
+    private fun tellChildrenWhoDaddyIs(parent: PairSnailNumber) {
+        parent.first.parent = parent
+        parent.second.parent = parent
+        if (parent.first is PairSnailNumber) {
+            tellChildrenWhoDaddyIs(parent.first as PairSnailNumber)
+        }
+        if (parent.second is PairSnailNumber) {
+            tellChildrenWhoDaddyIs(parent.second as PairSnailNumber)
+        }
+    }
+
+    private fun parsePairRecursive(string: String): PairSnailNumber {
+        index++
+        val first = parseRecursive(string)
+        if (string[index] == ',') index++
+        val second = parseRecursive(string)
+        index++
+        return PairSnailNumber(first, second)
+    }
+
+    private fun parseRecursive(string: String): SnailNumber {
+        var num = 0
+        while (string[index] != ']' && string[index] != ',') {
+            if (string[index] == '[') {
+                return parsePairRecursive(string)
+            } else {
+                num = num * 10 + string[index].digitToInt()
+                index++
+            }
+        }
+        index++
+        return ConstantSnailNumber(num)
+    }
+
     private val numbers = charArrayOf('0','1','2','3','4','5','6','7','8','9')
 }
