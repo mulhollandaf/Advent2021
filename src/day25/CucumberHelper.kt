@@ -4,18 +4,23 @@ class CucumberHelper(input: List<CharArray>) {
     var state = input
     val xMax = state[0].size - 1
     val yMax = state.size - 1
+    var hasChanged = false
     fun move(): List<CharArray> {
+        hasChanged = false
         val first = turn(state, '>')
         state = turn(first, 'v')
         return state
     }
 
-    private fun turn(map: List<CharArray>, which: Char): List<CharArray> =
-        map.mapIndexed { y, row ->
+    private fun turn(map: List<CharArray>, which: Char): List<CharArray> {
+        return map.mapIndexed { y, row ->
             row.mapIndexed { x, cell ->
-                determineByNeighbors(map, x, y, which)
+                val new = determineByNeighbors(map, x, y, which)
+                hasChanged = hasChanged || new != map[y][x]
+                new
             }.toCharArray()
         }
+    }
 
     private fun determineByNeighbors(map: List<CharArray>, x: Int, y: Int, which: Char): Char {
         return if (which == '>') {
@@ -61,18 +66,25 @@ class CucumberHelper(input: List<CharArray>) {
 
     fun runUntilStop(): Int {
         var nTurns = 0
-        var end = state
         while (nTurns < 10000) {
-            nTurns++
-            val start = end
-            val end = start.map {
-                it.toString().toCharArray()
+            val last = state
+            if (nTurns == 54) {
+                val oops = true
             }
-            if (start == end) {
+            output(state)
+            nTurns++
+            move()
+            if (!hasChanged) {
                 return nTurns
             }
         }
         return 0
+    }
+
+    fun output(state: List<CharArray>) {
+        state.forEach { println(String(it)) }
+        println()
+        println()
     }
 
 

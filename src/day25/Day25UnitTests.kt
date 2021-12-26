@@ -1,6 +1,7 @@
 package day25
 
 import org.junit.Test
+import readInput
 import kotlin.test.assertEquals
 
 class Day25UnitTests {
@@ -136,14 +137,62 @@ class Day25UnitTests {
     }
 
     @Test
-    fun testStepsUntilStopEmpty() {
-        val input = convertToChars(listOf(
-            "..."
+    fun testBroken3() {
+        val input = listOf(
+            "..>>v>vv..",
+            "..v.>>vvv.",
+            "..>>v>>v..",
+            "v.>>>>>vvv",
+            ".......>v.",
+            "v>v....>>v",
+            "vvv.>....>",
+            ">vv...>...",
+            ".>v.vv.v..",
         )
+
+        val helper = CucumberHelper(convertToChars(input))
+        val result = helper.move()
+        helper.output(result)
+    }
+
+    @Test
+    fun testStepsUntilStopEmpty() {
+        val input = convertToChars(
+            listOf(
+            "..."
+            )
         )
         val helper = CucumberHelper(input)
         val stepsUntilStop = helper.runUntilStop()
         assertEquals(1, stepsUntilStop)
+    }
+
+    @Test
+    fun testStepsUntilStopExample() {
+        val input = convertToChars(
+            listOf(
+                "v...>>.vv>",
+                ".vv>>.vv..",
+                ">>.>v>...v",
+                ">>v>>.>.v.",
+                "v>v.vv.v..",
+                ">.>>..v...",
+                ".vv..>.>v.",
+                "v.v..>>v.v",
+                "....v..v.>",
+            )
+        )
+        val helper = CucumberHelper(input)
+        val stepsUntilStop = helper.runUntilStop()
+        assertEquals(58, stepsUntilStop)
+    }
+
+    @Test
+    fun testPart1() {
+        val input = readInput("day25Full")
+        val helper = CucumberHelper(convertToChars(input))
+        val stepsUntilStop = helper.runUntilStop()
+        assertEquals(571, stepsUntilStop)
     }
 
     private fun convertToChars(listOf: List<String>): List<CharArray> {
